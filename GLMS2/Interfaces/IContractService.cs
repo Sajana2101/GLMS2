@@ -1,5 +1,6 @@
 ﻿using GLMS2.Models;
 using GLMS2.ViewModels;
+using GLMS2.Enums;
 
 namespace GLMS2.Interfaces
 {
@@ -8,6 +9,6 @@ namespace GLMS2.Interfaces
         Task<Contract> CreateContractAsync(ContractCreateViewModel model, string webRootPath);
         Task<IEnumerable<Contract>> GetAllContractsAsync();
         Task<Contract?> GetContractByIdAsync(int id);
-        Task<IEnumerable<Contract>> FilterContractsAsync(DateTime? startDateFrom, DateTime? startDateTo, string? status);
+        Task<IEnumerable<Contract>> FilterContractsAsync(DateTime? startDateFrom, DateTime? startDateTo, ContractStatus? status);
     }
 }
