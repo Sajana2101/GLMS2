@@ -1,4 +1,4 @@
-﻿namespace GLMS.Enums
+﻿namespace GLMS2.Enums
 {
     public enum ServiceRequestStatus
     {

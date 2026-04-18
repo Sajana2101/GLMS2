@@ -1,9 +1,9 @@
-﻿using GLMS.Enums;
-using GLMS.Models;
+﻿using GLMS2.Enums;
+using GLMS2.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GLMS.Models
+namespace GLMS2.Models
 {
     public class Contract
     {

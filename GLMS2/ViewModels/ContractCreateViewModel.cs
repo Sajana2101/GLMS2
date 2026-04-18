@@ -1,8 +1,8 @@
-﻿using GLMS.Enums;
+﻿using GLMS2.Enums;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
-namespace GLMS.ViewModels
+namespace GLMS2.ViewModels
 {
     public class ContractCreateViewModel
     {

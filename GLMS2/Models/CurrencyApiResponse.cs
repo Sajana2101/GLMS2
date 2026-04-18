@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GLMS.Models
+namespace GLMS2.Models
 {
     public class CurrencyApiResponse
     {

@@ -1,7 +1,7 @@
-﻿using GLMS.Enums;
+﻿using GLMS2.Enums;
 
 
-namespace GLMS.ViewModels
+namespace GLMS2.ViewModels
 {
     public class ContractFilterViewModel
     {

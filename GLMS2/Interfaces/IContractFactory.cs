@@ -1,7 +1,7 @@
-﻿using GLMS.Enums;
-using GLMS.Models;
+﻿using GLMS2.Enums;
+using GLMS2.Models;
 
-namespace GLMS.Interfaces
+namespace GLMS2.Interfaces
 {
     public interface IContractFactory
     {

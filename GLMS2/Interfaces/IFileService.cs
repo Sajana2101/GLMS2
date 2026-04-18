@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-namespace GLMS.Interfaces
+namespace GLMS2.Interfaces
 {
     public interface IFileService
     {

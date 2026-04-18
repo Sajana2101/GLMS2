@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GLMS.ViewModels
+namespace GLMS2.ViewModels
 {
     public class ServiceRequestCreateViewModel
     {

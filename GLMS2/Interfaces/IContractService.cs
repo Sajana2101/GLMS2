@@ -1,7 +1,7 @@
-﻿using GLMS.Models;
-using GLMS.ViewModels;
+﻿using GLMS2.Models;
+using GLMS2.ViewModels;
 
-namespace GLMS.Interfaces
+namespace GLMS2.Interfaces
 {
     public interface IContractService
     {

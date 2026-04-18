@@ -1,4 +1,4 @@
-﻿namespace GLMS.Interfaces
+﻿namespace GLMS2.Interfaces
 {
     public interface IContract
     {

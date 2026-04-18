@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GLMS.Models
+namespace GLMS2.Models
 {
     public class Client
     {
