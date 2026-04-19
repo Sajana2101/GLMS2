@@ -15,6 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Dependency Injection - Services
+builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IContractFactory, ContractFactory>();
 builder.Services.AddScoped<IContractService, ContractService>();

@@ -1,8 +1,8 @@
-﻿using GLMS2.Models;
-using GLMS2.ViewModels;
-using GLMS2.Data;
+﻿using GLMS2.Data;
 using GLMS2.Enums;
 using GLMS2.Interfaces;
+using GLMS2.Models;
+using GLMS2.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GLMS2.Services
@@ -35,7 +35,12 @@ namespace GLMS2.Services
                 throw new InvalidOperationException("Start date must be before end date.");
             }
 
-            var savedPath = await _fileService.SavePdfAsync(model.SignedAgreementFile!, webRootPath);
+            if (model.SignedAgreementFile == null)
+            {
+                throw new InvalidOperationException("A signed agreement PDF is required.");
+            }
+
+            var savedPath = await _fileService.SavePdfAsync(model.SignedAgreementFile, webRootPath);
 
             var contract = new Contract
             {
@@ -48,6 +53,7 @@ namespace GLMS2.Services
                 SignedAgreementFilePath = savedPath
             };
 
+            // Factory Pattern
             var contractPatternObject = _contractFactory.CreateContract(model.ContractType, contract);
 
             if (!contractPatternObject.Validate())
@@ -98,6 +104,21 @@ namespace GLMS2.Services
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task<bool> DeleteContractAsync(int id)
+        {
+            var contract = await _context.Contracts.FindAsync(id);
+
+            if (contract == null)
+            {
+                return false;
+            }
+
+            _context.Contracts.Remove(contract);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

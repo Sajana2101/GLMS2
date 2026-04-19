@@ -1,0 +1,84 @@
+﻿@model IEnumerable<GLMS2.Models.Contract>
+@using GLMS2.Enums
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<h2>Contracts</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Contract</a>
+</p>
+
+<form asp-action="Index" method="get" class="mb-3">
+    <div>
+        <label>Start Date From</label>
+        <input type="date" name="startDateFrom" value="@ViewBag.SelectedStartDateFrom" />
+    </div>
+
+    <div>
+        <label>Start Date To</label>
+        <input type="date" name="startDateTo" value="@ViewBag.SelectedStartDateTo" />
+    </div>
+
+    <div>
+        <label>Status</label>
+        <select name="status">
+            <option value="">-- All --</option>
+            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.StatusList)
+            {
+                if (item.Value == (string?)ViewBag.SelectedStatus)
+                {
+                    <option value="@item.Value" selected="selected">@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+        </select>
+    </div>
+
+    <button type="submit">Filter</button>
+    <a asp-action="Index">Clear</a>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>Contract Type</th>
+            <th>Service Level</th>
+            <th>Agreement</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contract in Model)
+        {
+            <tr>
+                <td>@contract.Client?.Name</td>
+                <td>@contract.StartDate.ToShortDateString()</td>
+                <td>@contract.EndDate.ToShortDateString()</td>
+                <td>@contract.Status</td>
+                <td>@contract.ContractType</td>
+                <td>@contract.ServiceLevel</td>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(contract.SignedAgreementFilePath))
+                    {
+                        <a asp-action="DownloadAgreement" asp-route-id="@contract.ContractId">Download PDF</a>
+                    }
+                    else
+                    {
+                        <span>No file</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@contract.ContractId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@contract.ContractId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

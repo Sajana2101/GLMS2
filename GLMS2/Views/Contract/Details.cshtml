@@ -1,0 +1,28 @@
+﻿@model GLMS2.Models.Contract
+
+<h2>Contract Details</h2>
+
+<div>
+    <p><strong>Client:</strong> @Model.Client?.Name</p>
+    <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+    <p><strong>End Date:</strong> @Model.EndDate.ToShortDateString()</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+    <p><strong>Contract Type:</strong> @Model.ContractType</p>
+    <p><strong>Service Level:</strong> @Model.ServiceLevel</p>
+
+    <p>
+        <strong>Signed Agreement:</strong>
+        @if (!string.IsNullOrWhiteSpace(Model.SignedAgreementFilePath))
+        {
+            <a asp-action="DownloadAgreement" asp-route-id="@Model.ContractId">Download PDF</a>
+        }
+        else
+        {
+            <span>No file uploaded</span>
+        }
+    </p>
+</div>
+
+<p>
+    <a asp-action="Index">Back to List</a>
+</p>

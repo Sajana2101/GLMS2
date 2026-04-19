@@ -10,5 +10,6 @@ namespace GLMS2.Interfaces
         Task<IEnumerable<Contract>> GetAllContractsAsync();
         Task<Contract?> GetContractByIdAsync(int id);
         Task<IEnumerable<Contract>> FilterContractsAsync(DateTime? startDateFrom, DateTime? startDateTo, ContractStatus? status);
+        Task<bool> DeleteContractAsync(int id);
     }
 }
