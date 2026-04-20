@@ -1,11 +1,9 @@
-﻿
-using GLMS2.Models;
-using GLMS2.Services.Mediator;
-using GLMS2.Services.Observers;
-using GLMS2.ViewModels;
-using GLMS2.Data;
+﻿using GLMS2.Data;
 using GLMS2.Enums;
 using GLMS2.Interfaces;
+using GLMS2.Models;
+using GLMS2.Services.Observers;
+using GLMS2.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GLMS2.Services
@@ -33,7 +31,9 @@ namespace GLMS2.Services
                 throw new ArgumentNullException(nameof(model));
             }
 
-            var contract = await _context.Contracts.FirstOrDefaultAsync(c => c.ContractId == model.ContractId);
+            var contract = await _context.Contracts
+                .Include(c => c.Client)
+                .FirstOrDefaultAsync(c => c.ContractId == model.ContractId);
 
             if (contract == null)
             {
@@ -48,6 +48,11 @@ namespace GLMS2.Services
             if (contract.Status != ContractStatus.Active)
             {
                 throw new InvalidOperationException("A service request can only be created for an active contract.");
+            }
+
+            if (model.CostUSD <= 0)
+            {
+                throw new InvalidOperationException("USD cost must be greater than 0.");
             }
 
             var rate = await _currencyService.GetUsdToZarRateAsync();
@@ -66,6 +71,7 @@ namespace GLMS2.Services
             _context.ServiceRequests.Add(serviceRequest);
             await _context.SaveChangesAsync();
 
+            // Observer Pattern
             var subject = new ServiceRequestSubject
             {
                 ServiceRequestId = serviceRequest.ServiceRequestId
@@ -75,6 +81,7 @@ namespace GLMS2.Services
             subject.Attach(new AuditObserver());
             subject.SetStatus(serviceRequest.Status.ToString());
 
+            // Mediator Pattern
             _mediator.Notify(this, "ServiceRequestCreated");
 
             return serviceRequest;
@@ -106,6 +113,21 @@ namespace GLMS2.Services
             }
 
             return contract.Status == ContractStatus.Active;
+        }
+
+        public async Task<bool> DeleteServiceRequestAsync(int id)
+        {
+            var serviceRequest = await _context.ServiceRequests.FindAsync(id);
+
+            if (serviceRequest == null)
+            {
+                return false;
+            }
+
+            _context.ServiceRequests.Remove(serviceRequest);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

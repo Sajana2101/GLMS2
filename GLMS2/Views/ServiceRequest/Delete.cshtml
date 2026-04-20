@@ -1,0 +1,18 @@
+﻿@model GLMS2.Models.ServiceRequest
+
+<h2>Delete Service Request</h2>
+
+<p>Are you sure you want to delete this service request?</p>
+
+<div>
+    <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>Cost (USD):</strong> @Model.CostUSD</p>
+    <p><strong>Cost (ZAR):</strong> @Model.CostZAR</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="ServiceRequestId" />
+    <button type="submit">Delete</button>
+    <a asp-action="Index">Cancel</a>
+</form>

@@ -9,5 +9,6 @@ namespace GLMS2.Interfaces
         Task<IEnumerable<ServiceRequest>> GetAllServiceRequestsAsync();
         Task<ServiceRequest?> GetServiceRequestByIdAsync(int id);
         Task<bool> CanCreateServiceRequestAsync(int contractId);
+        Task<bool> DeleteServiceRequestAsync(int id);
     }
 }
