@@ -155,5 +155,47 @@ namespace GLMS2.Controllers
                 })
                 .ToList();
         }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var model = await _contractService.GetContractForEditAsync(id);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            await LoadDropdowns();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ContractEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadDropdowns();
+                return View(model);
+            }
+
+            try
+            {
+                var updated = await _contractService.UpdateContractAsync(model, _environment.WebRootPath);
+
+                if (!updated)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                await LoadDropdowns();
+                return View(model);
+            }
+        }
     }
 }

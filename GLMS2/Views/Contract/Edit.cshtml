@@ -1,0 +1,70 @@
+﻿@model GLMS2.ViewModels.ContractEditViewModel
+
+<h2>Edit Contract</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <input type="hidden" asp-for="ContractId" />
+    <input type="hidden" asp-for="ExistingSignedAgreementFilePath" />
+
+    <div>
+        <label asp-for="ClientId"></label>
+        <select asp-for="ClientId" asp-items="ViewBag.Clients"></select>
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="StartDate"></label>
+        <input asp-for="StartDate" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="EndDate"></label>
+        <input asp-for="EndDate" type="date" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Status"></label>
+        <select asp-for="Status" asp-items="ViewBag.StatusList"></select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="ContractType"></label>
+        <select asp-for="ContractType" asp-items="ViewBag.ContractTypes"></select>
+        <span asp-validation-for="ContractType" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="ServiceLevel"></label>
+        <input asp-for="ServiceLevel" />
+        <span asp-validation-for="ServiceLevel" class="text-danger"></span>
+    </div>
+
+    <div>
+        <p><strong>Current Agreement:</strong></p>
+        @if (!string.IsNullOrWhiteSpace(Model.ExistingSignedAgreementFilePath))
+        {
+            <a asp-action="DownloadAgreement" asp-route-id="@Model.ContractId">Download Current PDF</a>
+        }
+        else
+        {
+            <span>No file uploaded</span>
+        }
+    </div>
+
+    <div>
+        <label asp-for="SignedAgreementFile"></label>
+        <input asp-for="SignedAgreementFile" type="file" accept=".pdf" />
+        <span asp-validation-for="SignedAgreementFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Save Changes</button>
+</form>
+
+<p>
+    <a asp-action="Index">Back to List</a>
+</p>

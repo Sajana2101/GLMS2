@@ -120,5 +120,71 @@ namespace GLMS2.Services
 
             return true;
         }
+        public async Task<ContractEditViewModel?> GetContractForEditAsync(int id)
+        {
+            var contract = await _context.Contracts.FindAsync(id);
+
+            if (contract == null)
+            {
+                return null;
+            }
+
+            return new ContractEditViewModel
+            {
+                ContractId = contract.ContractId,
+                ClientId = contract.ClientId,
+                StartDate = contract.StartDate,
+                EndDate = contract.EndDate,
+                Status = contract.Status,
+                ServiceLevel = contract.ServiceLevel,
+                ContractType = contract.ContractType,
+                ExistingSignedAgreementFilePath = contract.SignedAgreementFilePath
+            };
+        }
+
+        public async Task<bool> UpdateContractAsync(ContractEditViewModel model, string webRootPath)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var contract = await _context.Contracts.FindAsync(model.ContractId);
+
+            if (contract == null)
+            {
+                return false;
+            }
+
+            if (model.StartDate >= model.EndDate)
+            {
+                throw new InvalidOperationException("Start date must be before end date.");
+            }
+
+            contract.ClientId = model.ClientId;
+            contract.StartDate = model.StartDate;
+            contract.EndDate = model.EndDate;
+            contract.Status = model.Status;
+            contract.ServiceLevel = model.ServiceLevel;
+            contract.ContractType = model.ContractType;
+
+            if (model.SignedAgreementFile != null)
+            {
+                var savedPath = await _fileService.SavePdfAsync(model.SignedAgreementFile, webRootPath);
+                contract.SignedAgreementFilePath = savedPath;
+            }
+
+            var contractPatternObject = _contractFactory.CreateContract(model.ContractType, contract);
+
+            if (!contractPatternObject.Validate())
+            {
+                throw new InvalidOperationException("Contract validation failed.");
+            }
+
+            _context.Contracts.Update(contract);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

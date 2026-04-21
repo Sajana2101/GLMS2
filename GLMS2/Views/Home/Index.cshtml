@@ -1,8 +1,60 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-section d-flex align-items-center justify-content-center text-center text-white">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+        <h1 class="display-4 fw-bold">Global Logistics Management System</h1>
+        <p class="lead mt-3">
+            Streamline clients, contracts, and service requests in one centralized platform.
+        </p>
+
+        <div class="mt-4">
+            <a asp-controller="Client" asp-action="Index" class="btn btn-primary btn-lg me-2">View Clients</a>
+            <a asp-controller="Contract" asp-action="Index" class="btn btn-outline-light btn-lg me-2">View Contracts</a>
+            <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-success btn-lg">Service Requests</a>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="card-title">Clients</h3>
+                    <p class="card-text">
+                        Manage client information, contact details, and regional logistics records.
+                    </p>
+                    <a asp-controller="Client" asp-action="Index" class="btn btn-dark">Go to Clients</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="card-title">Contracts</h3>
+                    <p class="card-text">
+                        Track contracts, uploaded signed agreements, contract cost, and workflow status.
+                    </p>
+                    <a asp-controller="Contract" asp-action="Index" class="btn btn-dark">Go to Contracts</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="card-title">Service Requests</h3>
+                    <p class="card-text">
+                        Monitor service requests while applying the correct business workflow rules.
+                    </p>
+                    <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-dark">Go to Service Requests</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
