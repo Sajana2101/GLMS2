@@ -4,12 +4,13 @@ using Xunit;
 
 namespace GLMS2.Tests
 {
+    // Unit tests for validating file upload rules
     public class FileServiceTests
     {
         [Fact]
         public void IsPdf_ValidPdfFile_ShouldReturnTrue()
         {
-           
+            // Ensures only PDF files are allowed
             var service = new FileService();
             var file = CreateMockFormFile("contract.pdf", "Dummy PDF content");
 
@@ -23,7 +24,7 @@ namespace GLMS2.Tests
         [Fact]
         public void IsPdf_ExeFile_ShouldReturnFalse()
         {
-          
+            // Prevents non-PDF files from being saved
             var service = new FileService();
             var file = CreateMockFormFile("virus.exe", "Bad file");
 
@@ -37,7 +38,7 @@ namespace GLMS2.Tests
         [Fact]
         public async Task SavePdfAsync_InvalidFileType_ShouldThrowException()
         {
-            
+            // Prevents non-PDF files from being saved
             var service = new FileService();
             var file = CreateMockFormFile("virus.exe", "Bad file");
             var rootPath = Path.GetTempPath();
@@ -46,7 +47,7 @@ namespace GLMS2.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
     service.SavePdfAsync(file, rootPath));
         }
-
+        // Creates a mock file for testing upload functionality
         private IFormFile CreateMockFormFile(string fileName, string content)
         {
             var bytes = System.Text.Encoding.UTF8.GetBytes(content);

@@ -1,7 +1,7 @@
 ﻿@model GLMS2.ViewModels.ContractEditViewModel
 
 <h2>Edit Contract</h2>
-
+<!-- Form allows updating contract details and replacing PDF -->
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -45,6 +45,7 @@
     </div>
 
     <div>
+        <!-- Allows download of existing signed agreement -->
         <p><strong>Current Agreement:</strong></p>
         @if (!string.IsNullOrWhiteSpace(Model.ExistingSignedAgreementFilePath))
         {
@@ -57,6 +58,7 @@
     </div>
 
     <div>
+        <!-- Upload replacement PDF -->
         <label asp-for="SignedAgreementFile"></label>
         <input asp-for="SignedAgreementFile" type="file" accept=".pdf" />
         <span asp-validation-for="SignedAgreementFile" class="text-danger"></span>

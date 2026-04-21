@@ -4,8 +4,9 @@
 
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
-
+    <!-- Form sends contract data including PDF upload -->
     <div>
+        <!-- Select client linked to the contract -->
         <label asp-for="ClientId"></label>
         <select asp-for="ClientId" asp-items="ViewBag.Clients"></select>
         <span asp-validation-for="ClientId" class="text-danger"></span>

@@ -10,8 +10,10 @@ using Xunit;
 
 namespace GLMS2.Tests
 {
+    // Unit tests verifying service request business rules and workflow validation
     public class ServiceRequestServiceTests
     {
+        // Uses EF Core in-memory database for isolated testing
         private ApplicationDbContext GetDbContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -25,7 +27,7 @@ namespace GLMS2.Tests
         {
             
             var context = GetDbContext();
-
+            // Test client stored in database
             var client = new Client
             {
                 Name = "Test Client",
@@ -35,7 +37,7 @@ namespace GLMS2.Tests
 
             context.Clients.Add(client);
             await context.SaveChangesAsync();
-
+            // Contract must be Active to allow service request creation
             var contract = new Contract
             {
                 ClientId = client.ClientId,
@@ -51,7 +53,7 @@ namespace GLMS2.Tests
 
           
             var savedContract = await context.Contracts.FirstAsync();
-
+            // Mock external services to isolate business logic
             var currencyServiceMock = new Mock<ICurrencyService>();
             currencyServiceMock.Setup(x => x.GetUsdToZarRateAsync()).ReturnsAsync(18.00m);
             currencyServiceMock.Setup(x => x.ConvertUsdToZar(10m, 18.00m)).Returns(180.00m);
@@ -66,8 +68,8 @@ namespace GLMS2.Tests
                 Description = "Transport goods",
                 CostUSD = 10m
             };
+            // Service request created successfully for active contract
 
-            
             var result = await service.CreateServiceRequestAsync(model);
 
             
@@ -81,7 +83,7 @@ namespace GLMS2.Tests
         {
            
             var context = GetDbContext();
-
+            // Expired contracts should prevent service request creation
             var contract = new Contract
             {
                 ClientId = 1,
@@ -106,7 +108,7 @@ namespace GLMS2.Tests
                 Description = "Expired contract test",
                 CostUSD = 10m
             };
-
+            // Confirms workflow rule enforcement
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.CreateServiceRequestAsync(model));
@@ -115,6 +117,7 @@ namespace GLMS2.Tests
         [Fact]
         public async Task CreateServiceRequestAsync_OnHoldContract_ShouldThrowException()
         {
+            // OnHold contracts should prevent service request creation
             // Arrange
             var context = GetDbContext();
 
@@ -143,7 +146,7 @@ namespace GLMS2.Tests
                 CostUSD = 15m
             };
 
-          
+            // Confirms workflow validation prevents invalid creation
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.CreateServiceRequestAsync(model));
         }

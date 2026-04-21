@@ -5,7 +5,7 @@
 }
 
 <h1>Create Client</h1>
-
+<!-- Form sends data to ClientController Create action -->
 <form asp-action="Create" method="post">
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
@@ -30,5 +30,6 @@
 </form>
 
 @section Scripts {
+    <!-- Enables client-side validation -->
     <partial name="_ValidationScriptsPartial" />
 }
