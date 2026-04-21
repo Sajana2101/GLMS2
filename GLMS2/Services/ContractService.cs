@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GLMS2.Services
 {
+    // Handles business logic for contracts
+    // Works between controllers and the database
     public class ContractService : IContractService
     {
         private readonly ApplicationDbContext _context;
@@ -22,26 +24,27 @@ namespace GLMS2.Services
             _fileService = fileService;
             _contractFactory = contractFactory;
         }
-
+        // Creates a new contract and saves the uploaded PDF
         public async Task<Contract> CreateContractAsync(ContractCreateViewModel model, string webRootPath)
         {
+
             if (model == null)
             {
                 throw new ArgumentNullException(nameof(model));
             }
-
+            // Basic validation for contract dates
             if (model.StartDate >= model.EndDate)
             {
                 throw new InvalidOperationException("Start date must be before end date.");
             }
-
+            // Ensures a signed agreement file is provided
             if (model.SignedAgreementFile == null)
             {
                 throw new InvalidOperationException("A signed agreement PDF is required.");
             }
-
+            // Saves PDF file to server
             var savedPath = await _fileService.SavePdfAsync(model.SignedAgreementFile, webRootPath);
-
+            // Creates contract object from form data
             var contract = new Contract
             {
                 ClientId = model.ClientId,
@@ -54,8 +57,9 @@ namespace GLMS2.Services
             };
 
             // Factory Pattern
+            // Uses factory to create correct contract type
             var contractPatternObject = _contractFactory.CreateContract(model.ContractType, contract);
-
+            // Validates contract rules
             if (!contractPatternObject.Validate())
             {
                 throw new InvalidOperationException("Contract validation failed.");
@@ -66,14 +70,14 @@ namespace GLMS2.Services
 
             return contract;
         }
-
+        // Returns all contracts including related client data
         public async Task<IEnumerable<Contract>> GetAllContractsAsync()
         {
             return await _context.Contracts
                 .Include(c => c.Client)
                 .ToListAsync();
         }
-
+        // Retrieves a contract with related service requests
         public async Task<Contract?> GetContractByIdAsync(int id)
         {
             return await _context.Contracts
@@ -81,7 +85,7 @@ namespace GLMS2.Services
                 .Include(c => c.ServiceRequests)
                 .FirstOrDefaultAsync(c => c.ContractId == id);
         }
-
+        // Filters contracts based on date range and status
         public async Task<IEnumerable<Contract>> FilterContractsAsync(DateTime? startDateFrom, DateTime? startDateTo, ContractStatus? status)
         {
             var query = _context.Contracts
@@ -105,7 +109,7 @@ namespace GLMS2.Services
 
             return await query.ToListAsync();
         }
-
+        // Deletes a contract from the database
         public async Task<bool> DeleteContractAsync(int id)
         {
             var contract = await _context.Contracts.FindAsync(id);
@@ -120,6 +124,7 @@ namespace GLMS2.Services
 
             return true;
         }
+        // Retrieves contract data for editing
         public async Task<ContractEditViewModel?> GetContractForEditAsync(int id)
         {
             var contract = await _context.Contracts.FindAsync(id);
@@ -141,7 +146,7 @@ namespace GLMS2.Services
                 ExistingSignedAgreementFilePath = contract.SignedAgreementFilePath
             };
         }
-
+        // Updates contract details and replaces PDF if needed
         public async Task<bool> UpdateContractAsync(ContractEditViewModel model, string webRootPath)
         {
             if (model == null)
@@ -158,6 +163,7 @@ namespace GLMS2.Services
 
             if (model.StartDate >= model.EndDate)
             {
+                // Validates contract dates before saving
                 throw new InvalidOperationException("Start date must be before end date.");
             }
 
@@ -167,13 +173,13 @@ namespace GLMS2.Services
             contract.Status = model.Status;
             contract.ServiceLevel = model.ServiceLevel;
             contract.ContractType = model.ContractType;
-
+            // Saves new file if user uploads a replacement agreement
             if (model.SignedAgreementFile != null)
             {
                 var savedPath = await _fileService.SavePdfAsync(model.SignedAgreementFile, webRootPath);
                 contract.SignedAgreementFilePath = savedPath;
             }
-
+            // Validates updated contract using factory pattern
             var contractPatternObject = _contractFactory.CreateContract(model.ContractType, contract);
 
             if (!contractPatternObject.Validate())

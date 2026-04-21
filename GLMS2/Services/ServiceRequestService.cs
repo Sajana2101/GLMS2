@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GLMS2.Services
 {
+    // Handles business logic related to service requests
     public class ServiceRequestService : IServiceRequestService
     {
         private readonly ApplicationDbContext _context;
@@ -23,14 +24,14 @@ namespace GLMS2.Services
             _currencyService = currencyService;
             _mediator = mediator;
         }
-
+        // Creates a new service request linked to a contract
         public async Task<ServiceRequest> CreateServiceRequestAsync(ServiceRequestCreateViewModel model)
         {
             if (model == null)
             {
                 throw new ArgumentNullException(nameof(model));
             }
-
+            // Retrieves the selected contract
             var contract = await _context.Contracts
                 .Include(c => c.Client)
                 .FirstOrDefaultAsync(c => c.ContractId == model.ContractId);
@@ -39,7 +40,7 @@ namespace GLMS2.Services
             {
                 throw new InvalidOperationException("Selected contract does not exist.");
             }
-
+            // Ensures service requests are only created for valid contracts
             if (contract.Status == ContractStatus.Expired || contract.Status == ContractStatus.OnHold)
             {
                 throw new InvalidOperationException("A service request cannot be created for an expired or on-hold contract.");
@@ -49,12 +50,12 @@ namespace GLMS2.Services
             {
                 throw new InvalidOperationException("A service request can only be created for an active contract.");
             }
-
+            // Validates cost input
             if (model.CostUSD <= 0)
             {
                 throw new InvalidOperationException("USD cost must be greater than 0.");
             }
-
+            // Converts USD cost to ZAR using exchange rate service
             var rate = await _currencyService.GetUsdToZarRateAsync();
             var localCost = _currencyService.ConvertUsdToZar(model.CostUSD, rate);
 
@@ -70,7 +71,7 @@ namespace GLMS2.Services
 
             _context.ServiceRequests.Add(serviceRequest);
             await _context.SaveChangesAsync();
-
+            // Notifies observers when service request status is created
             // Observer Pattern
             var subject = new ServiceRequestSubject
             {
@@ -80,13 +81,13 @@ namespace GLMS2.Services
             subject.Attach(new NotificationObserver());
             subject.Attach(new AuditObserver());
             subject.SetStatus(serviceRequest.Status.ToString());
-
+            // Sends event through mediator
             // Mediator Pattern
             _mediator.Notify(this, "ServiceRequestCreated");
 
             return serviceRequest;
         }
-
+        // Retrieves all service requests with related contract and client data
         public async Task<IEnumerable<ServiceRequest>> GetAllServiceRequestsAsync()
         {
             return await _context.ServiceRequests
@@ -94,7 +95,7 @@ namespace GLMS2.Services
                 .ThenInclude(c => c!.Client)
                 .ToListAsync();
         }
-
+        // Retrieves a specific service request
         public async Task<ServiceRequest?> GetServiceRequestByIdAsync(int id)
         {
             return await _context.ServiceRequests
@@ -102,7 +103,7 @@ namespace GLMS2.Services
                 .ThenInclude(c => c!.Client)
                 .FirstOrDefaultAsync(sr => sr.ServiceRequestId == id);
         }
-
+        // Checks whether a service request can be created for a contract
         public async Task<bool> CanCreateServiceRequestAsync(int contractId)
         {
             var contract = await _context.Contracts.FirstOrDefaultAsync(c => c.ContractId == contractId);
@@ -114,7 +115,7 @@ namespace GLMS2.Services
 
             return contract.Status == ContractStatus.Active;
         }
-
+        // Deletes a service request
         public async Task<bool> DeleteServiceRequestAsync(int id)
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
@@ -129,7 +130,7 @@ namespace GLMS2.Services
 
             return true;
         }
-
+        // Retrieves service request data for editing
         public async Task<ServiceRequestEditViewModel?> GetServiceRequestForEditAsync(int id)
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
@@ -148,7 +149,7 @@ namespace GLMS2.Services
                 CostZAR = serviceRequest.CostZAR
             };
         }
-
+        // Updates service request information
         public async Task<bool> UpdateServiceRequestAsync(ServiceRequestEditViewModel model)
         {
             if (model == null)
@@ -162,7 +163,7 @@ namespace GLMS2.Services
             {
                 return false;
             }
-
+            // Ensures contract is still valid
             var contract = await _context.Contracts.FirstOrDefaultAsync(c => c.ContractId == model.ContractId);
 
             if (contract == null)
@@ -179,7 +180,7 @@ namespace GLMS2.Services
             {
                 throw new InvalidOperationException("A service request can only be assigned to an active contract.");
             }
-
+            // Updates currency values
             var rate = await _currencyService.GetUsdToZarRateAsync();
             var localCost = _currencyService.ConvertUsdToZar(model.CostUSD, rate);
 
@@ -190,7 +191,7 @@ namespace GLMS2.Services
 
             _context.ServiceRequests.Update(serviceRequest);
             await _context.SaveChangesAsync();
-
+            // Notifies observers after update
             var subject = new ServiceRequestSubject
             {
                 ServiceRequestId = serviceRequest.ServiceRequestId
