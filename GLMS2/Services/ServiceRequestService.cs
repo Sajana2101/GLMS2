@@ -129,5 +129,80 @@ namespace GLMS2.Services
 
             return true;
         }
+
+        public async Task<ServiceRequestEditViewModel?> GetServiceRequestForEditAsync(int id)
+        {
+            var serviceRequest = await _context.ServiceRequests.FindAsync(id);
+
+            if (serviceRequest == null)
+            {
+                return null;
+            }
+
+            return new ServiceRequestEditViewModel
+            {
+                ServiceRequestId = serviceRequest.ServiceRequestId,
+                ContractId = serviceRequest.ContractId,
+                Description = serviceRequest.Description,
+                CostUSD = serviceRequest.CostUSD,
+                CostZAR = serviceRequest.CostZAR
+            };
+        }
+
+        public async Task<bool> UpdateServiceRequestAsync(ServiceRequestEditViewModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var serviceRequest = await _context.ServiceRequests.FindAsync(model.ServiceRequestId);
+
+            if (serviceRequest == null)
+            {
+                return false;
+            }
+
+            var contract = await _context.Contracts.FirstOrDefaultAsync(c => c.ContractId == model.ContractId);
+
+            if (contract == null)
+            {
+                throw new InvalidOperationException("Selected contract does not exist.");
+            }
+
+            if (contract.Status == ContractStatus.Expired || contract.Status == ContractStatus.OnHold)
+            {
+                throw new InvalidOperationException("A service request cannot be assigned to an expired or on-hold contract.");
+            }
+
+            if (contract.Status != ContractStatus.Active)
+            {
+                throw new InvalidOperationException("A service request can only be assigned to an active contract.");
+            }
+
+            var rate = await _currencyService.GetUsdToZarRateAsync();
+            var localCost = _currencyService.ConvertUsdToZar(model.CostUSD, rate);
+
+            serviceRequest.ContractId = model.ContractId;
+            serviceRequest.Description = model.Description;
+            serviceRequest.CostUSD = model.CostUSD;
+            serviceRequest.CostZAR = localCost;
+
+            _context.ServiceRequests.Update(serviceRequest);
+            await _context.SaveChangesAsync();
+
+            var subject = new ServiceRequestSubject
+            {
+                ServiceRequestId = serviceRequest.ServiceRequestId
+            };
+
+            subject.Attach(new NotificationObserver());
+            subject.Attach(new AuditObserver());
+            subject.SetStatus(serviceRequest.Status.ToString());
+
+            _mediator.Notify(this, "ServiceRequestCreated");
+
+            return true;
+        }
     }
 }

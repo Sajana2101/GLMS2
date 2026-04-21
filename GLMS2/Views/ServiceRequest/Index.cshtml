@@ -32,6 +32,7 @@
                 <td>@request.CreatedDate.ToShortDateString()</td>
                 <td>
                     <a asp-action="Details" asp-route-id="@request.ServiceRequestId">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@request.ServiceRequestId">Edit</a> |
                     <a asp-action="Delete" asp-route-id="@request.ServiceRequestId">Delete</a>
                 </td>
             </tr>

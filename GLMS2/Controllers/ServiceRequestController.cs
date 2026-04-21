@@ -152,5 +152,82 @@ namespace GLMS2.Controllers
                 "ContractId",
                 "DisplayText");
         }
+        public async Task<IActionResult> Edit(int id)
+        {
+            var model = await _serviceRequestService.GetServiceRequestForEditAsync(id);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            await LoadContractsDropdown();
+
+            try
+            {
+                model.ExchangeRate = await _currencyService.GetUsdToZarRateAsync();
+            }
+            catch
+            {
+               
+                model.ExchangeRate = 0;
+            }
+
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ServiceRequestEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadContractsDropdown();
+
+                try
+                {
+                    model.ExchangeRate = await _currencyService.GetUsdToZarRateAsync();
+                    model.CostZAR = model.CostUSD > 0
+                        ? _currencyService.ConvertUsdToZar(model.CostUSD, model.ExchangeRate)
+                        : 0;
+                }
+                catch
+                {
+                    ViewBag.ApiError = "Exchange rate could not be loaded.";
+                }
+
+                return View(model);
+            }
+
+            try
+            {
+                var updated = await _serviceRequestService.UpdateServiceRequestAsync(model);
+
+                if (!updated)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                await LoadContractsDropdown();
+
+                try
+                {
+                    model.ExchangeRate = await _currencyService.GetUsdToZarRateAsync();
+                    model.CostZAR = model.CostUSD > 0
+                        ? _currencyService.ConvertUsdToZar(model.CostUSD, model.ExchangeRate)
+                        : 0;
+                }
+                catch
+                {
+                    ViewBag.ApiError = "Exchange rate could not be loaded.";
+                }
+
+                return View(model);
+            }
+        }
     }
 }

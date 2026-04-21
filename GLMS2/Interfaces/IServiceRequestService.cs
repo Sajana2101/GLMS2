@@ -10,5 +10,7 @@ namespace GLMS2.Interfaces
         Task<ServiceRequest?> GetServiceRequestByIdAsync(int id);
         Task<bool> CanCreateServiceRequestAsync(int contractId);
         Task<bool> DeleteServiceRequestAsync(int id);
+        Task<ServiceRequestEditViewModel?> GetServiceRequestForEditAsync(int id);
+        Task<bool> UpdateServiceRequestAsync(ServiceRequestEditViewModel model);
     }
 }
