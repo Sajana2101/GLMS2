@@ -14,7 +14,7 @@
             <th>Description</th>
             <th>Cost (USD)</th>
             <th>Cost (ZAR)</th>
-            <th>Status</th>
+            <th>Contract Status</th>
             <th>Created Date</th>
             <th>Actions</th>
         </tr>
@@ -28,7 +28,7 @@
                 <td>@request.Description</td>
                 <td>@request.CostUSD</td>
                 <td>@request.CostZAR</td>
-                <td>@request.Status</td>
+                <td>@request.Contract?.Status</td>
                 <td>@request.CreatedDate.ToShortDateString()</td>
                 <td>
                     <a asp-action="Details" asp-route-id="@request.ServiceRequestId">Details</a> |
